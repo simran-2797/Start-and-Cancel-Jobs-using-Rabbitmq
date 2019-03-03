@@ -28,6 +28,10 @@ amqp.connect('amqp://user:password@localhost:5672', function(err, conn) {
           console.log(" [x] Done");
           ch.ack(msg);
         });
+        upload.on('exit',()=>{
+          console.log('Child exited');
+          ch.ack(msg);
+        });
       }, {noAck: false});
     });
 
