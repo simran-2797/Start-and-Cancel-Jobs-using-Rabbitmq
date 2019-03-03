@@ -46,3 +46,39 @@ if(args1[0] === currentProcessJobId) {
 }
 ```
 
+## Example
+The following code requires the following node dependencies:
+* "amqplib": "^0.3.0",
+* "sleep": "^6.0.0"
+
+Start RabbitMQ. Open 3 terminals. We will implement 1 producer and 2 consumers. 
+In the first terminal start the producer.
+```sh
+$ cd producer
+$ npm start
+```
+In the other two terminals start the consumer.js
+```sh
+$ cd consumer
+$ node consumer.js
+```
+Open Postman and make a POST request using 'localhost:3000/upload' with the following JSON parameters:
+```
+{
+	"jobId" : "5c7b5fd7559f4b0f6f1b6325",
+	"message": " UPLOADING JOB: 5c7b5fd7559f4b0f6f1b6325"
+}
+```
+You will notice that in one of the terminal a job has started. You can make one more post request with different jobId and message. You will notice that this job has started in the vacant terminal. If you make another post request, the consumer which finishes a job first will take up the next job in the queue. 
+
+While these jobs are happening, you can try sending a cancel request. Suppose I want to cancel jobId "5c7b5fd7559f4b0f6f1b6325" while it is running. I will make a POST request using 'localhost:3000/cancel' with the following JSON parameters:
+```
+{
+	"jobId" : "5c7b5fd7559f4b0f6f1b6325",
+	"message": " CANCELLING JOB: 5c7b5fd7559f4b0f6f1b6325"
+}
+```
+You will notice that the terminal which is executing job with jobId 5c7b5fd7559f4b0f6f1b6325 will terminate the job. You can try uploading a new job. Since the job is cancelled our consumer is free and it will take up the next job it gets in the queue. 
+
+In this way, the project demonstrates a worker queue which can start as well as cancel the jobs. 
+
